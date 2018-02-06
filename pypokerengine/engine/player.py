@@ -1,5 +1,5 @@
 from pypokerengine.engine.pay_info import PayInfo
-from pypokerengine.engine.card import Card
+#from pypokerengine.engine.card import Card
 from pypokerengine.engine.poker_constants import PokerConstants as Const
 
 
@@ -26,7 +26,7 @@ class Player:
       raise ValueError(self.__dup_hole_msg)
     if len(cards) != 2:
       raise ValueError(self.__wrong_num_hole_msg % (len(cards)))
-    if not all([isinstance(card, Card) for card in cards]):
+    if not all([isinstance(card, int) for card in cards]):
       raise ValueError(self.__wrong_type_hole_msg)
     self.hole_card = cards
 
@@ -83,7 +83,7 @@ class Player:
     return last_pay_history["amount"] if last_pay_history else 0
 
   def serialize(self):
-    hole = [card.to_id() for card in self.hole_card]
+    hole = [card for card in self.hole_card]
     return [
         self.name, self.uuid, self.stack, hole,\
             self.action_histories[::], self.pay_info.serialize(), self.round_action_histories[::]
@@ -91,7 +91,7 @@ class Player:
 
   @classmethod
   def deserialize(self, serial):
-    hole = [Card.from_id(cid) for cid in serial[3]]
+    hole = [cid for cid in serial[3]]
     player = self(serial[1], serial[2], serial[0])
     if len(hole)!=0: player.add_holecard(hole)
     player.action_histories = serial[4]

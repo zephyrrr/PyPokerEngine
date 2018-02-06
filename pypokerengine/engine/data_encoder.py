@@ -3,6 +3,7 @@ from functools import reduce
 from pypokerengine.engine.pay_info import PayInfo
 from pypokerengine.engine.poker_constants import PokerConstants as Const
 from pypokerengine.engine.game_evaluator import GameEvaluator
+from .card import Card
 
 class DataEncoder:
 
@@ -19,7 +20,7 @@ class DataEncoder:
         "state": self.__payinfo_to_str(player.pay_info.status)
         }
     if holecard:
-      hole_hash = {"hole_card": [str(card) for card in player.hole_card]}
+      hole_hash = {"hole_card": [Card.int_to_str(card) for card in player.hole_card]}
       hash_.update(hole_hash)
     return hash_
 
@@ -97,7 +98,7 @@ class DataEncoder:
     hsh = {
         "street": self.__street_to_str(state["street"]),
         "pot": self.encode_pot(state["table"].seats.players),
-        "community_card": [str(card) for card in state["table"].get_community_card()],
+        "community_card": [Card.int_to_str(card) for card in state["table"].get_community_card()],
         "dealer_btn": state["table"].dealer_btn,
         "next_player": state["next_player"],
         "small_blind_pos": state["table"].sb_pos(),

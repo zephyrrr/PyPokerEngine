@@ -1,35 +1,44 @@
 from functools import reduce
 from itertools import groupby
 
+from . import Card
+from . import Evaluator
+evaluator = Evaluator()
+
 class HandEvaluator:
 
-  HIGHCARD      = 0
-  ONEPAIR       = 1 << 8
-  TWOPAIR       = 1 << 9
-  THREECARD     = 1 << 10
-  STRAIGHT      = 1 << 11
-  FLASH         = 1 << 12
-  FULLHOUSE     = 1 << 13
-  FOURCARD      = 1 << 14
-  STRAIGHTFLASH = 1 << 15
+  # HIGHCARD      = 0
+  # ONEPAIR       = 1 << 8
+  # TWOPAIR       = 1 << 9
+  # THREECARD     = 1 << 10
+  # STRAIGHT      = 1 << 11
+  # FLASH         = 1 << 12
+  # FULLHOUSE     = 1 << 13
+  # FOURCARD      = 1 << 14
+  # STRAIGHTFLASH = 1 << 15
 
-  HAND_STRENGTH_MAP = {
-      HIGHCARD: "HIGHCARD",
-      ONEPAIR: "ONEPAIR",
-      TWOPAIR: "TWOPAIR",
-      THREECARD: "THREECARD",
-      STRAIGHT: "STRAIGHT",
-      FLASH: "FLASH",
-      FULLHOUSE: "FULLHOUSE",
-      FOURCARD: "FOURCARD",
-      STRAIGHTFLASH: "STRAIGHTFLASH"
-  }
+  # HAND_STRENGTH_MAP = {
+  #     HIGHCARD: "HIGHCARD",
+  #     ONEPAIR: "ONEPAIR",
+  #     TWOPAIR: "TWOPAIR",
+  #     THREECARD: "THREECARD",
+  #     STRAIGHT: "STRAIGHT",
+  #     FLASH: "FLASH",
+  #     FULLHOUSE: "FULLHOUSE",
+  #     FOURCARD: "FOURCARD",
+  #     STRAIGHTFLASH: "STRAIGHTFLASH"
+  # }
 
   @classmethod
   def gen_hand_rank_info(self, hole, community):
-    hand = self.eval_hand(hole, community)
-    row_strength = self.__mask_hand_strength(hand)
-    strength = self.HAND_STRENGTH_MAP[row_strength]
+    #Card.print_pretty_cards(community + hole)
+    p1_score = self.eval_hand(community, hole)
+    p1_class = evaluator.get_rank_class(p1_score)
+
+    hand = p1_score
+    # hand = self.eval_hand(hole, community)
+    # row_strength = self.__mask_hand_strength(hand)
+    # strength = self.HAND_STRENGTH_MAP[row_strength]
     hand_high = self.__mask_hand_high_rank(hand)
     hand_low = self.__mask_hand_low_rank(hand)
     hole_high = self.__mask_hole_high_rank(hand)
@@ -37,7 +46,7 @@ class HandEvaluator:
 
     return {
         "hand" : {
-          "strength" : strength,
+          "strength" : evaluator.class_to_string(p1_class),
           "high" : hand_high,
           "low" : hand_low
         },
@@ -49,10 +58,14 @@ class HandEvaluator:
 
   @classmethod
   def eval_hand(self, hole, community):
-    ranks = sorted([card.rank for card in hole])
-    hole_flg = ranks[1] << 4 | ranks[0]
-    hand_flg = self.__calc_hand_info_flg(hole, community) << 8
-    return hand_flg | hole_flg
+    return evaluator.evaluate(community, hole)
+
+  # @classmethod
+  # def eval_hand(self, hole, community):
+  #   ranks = sorted([card.rank for card in hole])
+  #   hole_flg = ranks[1] << 4 | ranks[0]
+  #   hand_flg = self.__calc_hand_info_flg(hole, community) << 8
+  #   return hand_flg | hole_flg
 
   # Return Format
   # [Bit flg of hand][rank1(4bit)][rank2(4bit)]

@@ -1,4 +1,4 @@
-from pypokerengine.engine.card import Card
+#from pypokerengine.engine.card import Card
 from pypokerengine.engine.seats import Seats
 from pypokerengine.engine.deck import Deck
 
@@ -48,7 +48,7 @@ class Table:
     return self.__find_entitled_player_pos(start_pos, lambda player: player.is_waiting_ask())
 
   def serialize(self):
-    community_card = [card.to_id() for card in self._community_card]
+    community_card = [card for card in self._community_card]
     return [
         self.dealer_btn, Seats.serialize(self.seats),
         Deck.serialize(self.deck), community_card, self._blind_pos
@@ -57,7 +57,7 @@ class Table:
   @classmethod
   def deserialize(self, serial):
     deck = Deck.deserialize(serial[2])
-    community_card = [Card.from_id(cid) for cid in serial[3]]
+    community_card = [cid for cid in serial[3]]
     table = self(cheat_deck=deck)
     table.dealer_btn = serial[0]
     table.seats = Seats.deserialize(serial[1])

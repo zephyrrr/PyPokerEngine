@@ -42,7 +42,7 @@ class GameEvaluator:
 
     active_players = [player for player in players if player.is_active()]
     scores = [score_player(player) for player in active_players]
-    best_score = max(scores)
+    best_score = min(scores)
     score_with_players = [(score, player) for score, player in zip(scores, active_players)]
     winners = [s_p[1] for s_p in score_with_players if s_p[0] == best_score]
     return winners
